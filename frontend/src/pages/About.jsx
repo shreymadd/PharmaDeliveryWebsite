@@ -14,10 +14,56 @@ const About = () => {
       <div className='my-10 flex flex-col md:flex-row gap-16'>
           <img className='w-full md:max-w-[450px]' src={assets.about_img} alt="" />
           <div className='flex flex-col justify-center gap-6 md:w-2/4 text-gray-600'>
-              <p>Forever was born out of a passion for innovation and a desire to revolutionize the way people shop online. Our journey began with a simple idea: to provide a platform where customers can easily discover, explore, and purchase a wide range of products from the comfort of their homes.</p>
-              <p>Since our inception, we've worked tirelessly to curate a diverse selection of high-quality products that cater to every taste and preference. From fashion and beauty to electronics and home essentials, we offer an extensive collection sourced from trusted brands and suppliers.</p>
+              <p>MedSwift revolutionizes healthcare access by delivering genuine medicines in under 30 minutes. We bridge the gap between pharmacies and patients, ensuring critical medications reach you fast, safely, and reliably.</p>
+             <p>✅ Lightning-Fast Delivery
+
+Get prescriptions and OTC medicines delivered in minutes.
+
+Real-time tracking with live driver updates.
+
+✅ 100% Authentic Medicines
+
+Sourced only from licensed pharmacies.
+
+Verified expiration dates and batch numbers.
+
+✅ Smart Prescription Management
+
+Upload prescriptions via app/website.
+
+AI-powered validation for safety.
+
+✅ Seamless Experience
+
+Easy reordering for chronic medications.
+
+Scheduled deliveries for regular needs.
+
+✅ Safety First
+
+HIPAA-compliant data handling.
+
+Tamper-proof packaging.</p>
               <b className='text-gray-800'>Our Mission</b>
-              <p>Our mission at Forever is to empower customers with choice, convenience, and confidence. We're dedicated to providing a seamless shopping experience that exceeds expectations, from browsing and ordering to delivery and beyond.</p>
+              <p>At MedSwift, we believe that access to essential medicines should be fast, reliable, and hassle-free. Our mission is to revolutionize healthcare delivery by:
+
+Saving Lives in Minutes
+
+Providing instant, on-demand delivery of prescription and over-the-counter medications—because emergencies can’t wait.
+
+Guaranteeing Authenticity
+
+Partnering only with licensed pharmacies to ensure every product is 100% genuine, properly stored, and safety-checked.
+
+Bridging Healthcare Gaps
+
+Serving remote areas, elderly patients, and busy professionals with a seamless digital healthcare experience.
+
+Innovating for Tomorrow
+
+Using AI-driven logistics and real-time tracking to set new standards in pharmaceutical delivery efficiency.
+
+Every second counts. We deliver more than medicines—we deliver peace of mind.</p>
           </div>
       </div>
 
