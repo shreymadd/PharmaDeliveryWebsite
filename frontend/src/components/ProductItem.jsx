@@ -12,11 +12,11 @@ const ProductItem = ({id, image, name, price, sizes}) => {
 
     const handleAddToCart = (e) => {
         e.preventDefault(); // Prevent navigation when clicking add to cart
-        if (sizes && !selectedSize) {
+        if (sizes && sizes.length > 0 && !selectedSize) {
             toast.error('Please select a size');
             return;
         }
-        addToCart(id, selectedSize);
+        addToCart(id, selectedSize || 'default');
     };
 
     return (

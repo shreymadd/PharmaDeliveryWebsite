@@ -1,16 +1,17 @@
-import React, { useEffect, useState} from 'react'
-import { products } from '../assets/assets'
+import React, { useEffect, useState, useContext } from 'react'
 import Title from './Title';
 import ProductItem from './ProductItem';
+import { ShopContext } from '../context/ShopContext';
 
 const LatestCollection = () => {
+    const { backendProducts } = useContext(ShopContext);
     const [latestProducts, setLatestProducts] = useState([]);
     
     useEffect(() => {
-        // Sort products by date in descending order (newest first) and take first 4
-        const sortedProducts = [...products].sort((a, b) => b.date - a.date);
+        // Sort backend products by date in descending order (newest first) and take first 4
+        const sortedProducts = [...backendProducts].sort((a, b) => b.date - a.date);
         setLatestProducts(sortedProducts.slice(0, 4));
-    }, []);
+    }, [backendProducts]);
 
     return (
     <div className='my-10'>
@@ -25,7 +26,14 @@ Stay ahead with the newest and most effective medicines, carefully selected to m
         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6'>
             {
                 latestProducts.map((items,index)=>(
-                    <ProductItem key={items._id} id={items._id} image={items.image} name={items.name} price={items.price}/>
+                    <ProductItem 
+                        key={items._id} 
+                        id={items._id} 
+                        image={items.image} 
+                        name={items.name} 
+                        price={items.price}
+                        sizes={items.sizes}
+                    />
                 ))
             }
         </div>

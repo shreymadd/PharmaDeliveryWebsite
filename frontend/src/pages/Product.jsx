@@ -6,7 +6,7 @@ import RelatedProducts from '../components/RelatedProducts';
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { staticProductsList, backendProducts, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(null);
   const [mainImage, setMainImage] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
@@ -14,15 +14,17 @@ const Product = () => {
   const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
-    if (products?.length) {
-      const product = products.find(item => item._id === productId);
-      if (product) {
-        setProductData(product);
-        setMainImage(product.image[0]);
-        setSelectedSize(product.sizes?.[0] || '');
-      }
+    // Check both static and backend products
+    const staticProduct = staticProductsList.find(item => item._id === productId);
+    const backendProduct = backendProducts.find(item => item._id === productId);
+    const product = staticProduct || backendProduct;
+
+    if (product) {
+      setProductData(product);
+      setMainImage(Array.isArray(product.image) ? product.image[0] : product.image);
+      setSelectedSize(product.sizes?.[0] || '');
     }
-  }, [productId, products]);
+  }, [productId, staticProductsList, backendProducts]);
 
   const handleAddToCart = async () => {
     if (productData.sizes?.length && !selectedSize) {
@@ -31,14 +33,7 @@ const Product = () => {
     }
     setIsAdding(true);
 
-    addToCart({
-      id: productData._id,
-      name: productData.name,
-      price: productData.price,
-      image: productData.image[0],
-      size: selectedSize,
-      quantity,
-    });
+    addToCart(productData._id, selectedSize || 'default');
 
     await new Promise(res => setTimeout(res, 500));
     setIsAdding(false);
@@ -56,7 +51,7 @@ const Product = () => {
         <div className='md:w-1/2'>
           <img src={mainImage} alt={productData.name} className='w-full h-96 object-contain rounded' />
           <div className='flex gap-2 mt-4 overflow-x-auto'>
-            {productData.image.map((img, i) => (
+            {(Array.isArray(productData.image) ? productData.image : [productData.image]).map((img, i) => (
               <img
                 key={i}
                 src={img}
@@ -101,17 +96,27 @@ const Product = () => {
           <div className='mt-6'>
             <p className='text-sm font-medium'>Quantity</p>
             <div className='flex items-center gap-4 mt-2'>
-              <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className='border px-4 py-1'>−</button>
+              <button
+                onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                className='px-3 py-1 border rounded hover:bg-gray-100'
+              >
+                -
+              </button>
               <span>{quantity}</span>
-              <button onClick={() => setQuantity(q => q + 1)} className='border px-4 py-1'>+</button>
+              <button
+                onClick={() => setQuantity(prev => prev + 1)}
+                className='px-3 py-1 border rounded hover:bg-gray-100'
+              >
+                +
+              </button>
             </div>
           </div>
 
-          {/* Add to Cart */}
+          {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
             disabled={isAdding}
-            className={`mt-6 w-full py-3 text-white font-semibold rounded ${isAdding ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}
+            className='w-full mt-8 py-3 bg-black text-white rounded hover:bg-gray-800 transition-colors disabled:bg-gray-400'
           >
             {isAdding ? 'Adding...' : 'Add to Cart'}
           </button>
@@ -135,7 +140,7 @@ const Product = () => {
       </div>
 
       {/* Related Products */}
-      {/* <RelatedProducts category={productData.category} /> */}
+      <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
     </div>
   );
 };

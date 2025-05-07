@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { products, assets } from '../assets/assets';
+import React, { useState, useContext } from 'react';
+import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
+import { ShopContext } from '../context/ShopContext';
 
 const Collection = () => {
+  const { staticProductsList } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [sortOption, setSortOption] = useState('relevant');
-  
+  const [search, setSearch] = useState('');
+
   // Filter states
   const [categoryFilters, setCategoryFilters] = useState({
     'Health care': false,
@@ -15,18 +18,10 @@ const Collection = () => {
     'Women': false,
     'Kids': false
   });
-  
+
   const [subCategoryFilters, setSubCategoryFilters] = useState({
     'gender-Specific': false,
-    'summer Essentials': false,
-    'Topwear': false,
-    'Bottomwear': false
-  });
-  
-  const [priceFilters, setPriceFilters] = useState({
-    'Under ₹500': false,
-    '₹500 - ₹1000': false,
-    'Above ₹1000': false
+    'summer Essentials': false
   });
 
   // Handle filter changes
@@ -44,32 +39,20 @@ const Collection = () => {
     }));
   };
 
-  const handlePriceChange = (priceRange) => {
-    setPriceFilters(prev => ({
-      ...prev,
-      [priceRange]: !prev[priceRange]
-    }));
-  };
+  // Apply filters + search
+  const filteredProducts = staticProductsList.filter(product => {
+    // Search match
+    const searchMatch = product.name.toLowerCase().includes(search.toLowerCase());
 
-  // Apply filters to products
-  const filteredProducts = products.filter(product => {
-    // Category filter
-    const categoryMatch = Object.keys(categoryFilters).every(key => 
-      !categoryFilters[key] || product.category === key
-    );
-    
-    // SubCategory filter
-    const subCategoryMatch = Object.keys(subCategoryFilters).every(key => 
-      !subCategoryFilters[key] || product.subCategory === key
-    );
-    
-    // Price filter
-    const priceMatch = 
-      (!priceFilters['Under ₹500'] || product.price < 500) &&
-      (!priceFilters['₹500 - ₹1000'] || (product.price >= 500 && product.price <= 1000)) &&
-      (!priceFilters['Above ₹1000'] || product.price > 1000);
-    
-    return categoryMatch && subCategoryMatch && priceMatch;
+    // Category match
+    const activeCategories = Object.keys(categoryFilters).filter(cat => categoryFilters[cat]);
+    const categoryMatch = activeCategories.length === 0 || activeCategories.includes(product.category);
+
+    // Subcategory match
+    const activeSubCategories = Object.keys(subCategoryFilters).filter(sub => subCategoryFilters[sub]);
+    const subCategoryMatch = activeSubCategories.length === 0 || activeSubCategories.includes(product.subCategory);
+
+    return searchMatch && categoryMatch && subCategoryMatch;
   });
 
   // Sort products
@@ -79,7 +62,7 @@ const Collection = () => {
   } else if (sortOption === 'high-to-low') {
     sortedProducts.sort((a, b) => b.price - a.price);
   } else if (sortOption === 'newest') {
-    sortedProducts.sort((a, b) => b.date - a.date);
+    sortedProducts.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
 
   return (
@@ -99,8 +82,8 @@ const Collection = () => {
         </p>
 
         {/* Category filter */}
-        <div className={`border border-gray-300 pl-5 py-2 mt-6 ${showFilter ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>Categories</p>
+        <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '' : 'hidden'} sm:block`}>
+          <p className='mb-3 text-sm font-medium'>Category</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             {Object.keys(categoryFilters).map(category => (
               <label key={category} className='flex gap-2'>
@@ -118,7 +101,7 @@ const Collection = () => {
 
         {/* SubCategory filter */}
         <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>Sub Categories</p>
+          <p className='mb-3 text-sm font-medium'>SubCategory</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             {Object.keys(subCategoryFilters).map(subCategory => (
               <label key={subCategory} className='flex gap-2'>
@@ -133,30 +116,23 @@ const Collection = () => {
             ))}
           </div>
         </div>
-
-        {/* Price filter */}
-        <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>Price Range</p>
-          <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
-            {Object.keys(priceFilters).map(range => (
-              <label key={range} className='flex gap-2'>
-                <input 
-                  className='w-3' 
-                  type="checkbox" 
-                  checked={priceFilters[range]}
-                  onChange={() => handlePriceChange(range)}
-                /> 
-                {range}
-              </label>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Right Side */}
       <div className='flex-1'>
-        <div className='flex justify-between items-center text-base sm:text-2xl mb-4'>
+        <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center text-base sm:text-2xl mb-4 gap-3 sm:gap-0'>
           <Title text1={'ALL'} text2={'COLLECTION'} />
+          
+          {/* Search bar */}
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="text-sm px-2 py-1 border border-gray-300 rounded-md sm:w-64"
+          />
+
+          {/* Sort dropdown */}
           <select
             className='text-sm border border-gray-300 px-3 py-1 rounded-md'
             value={sortOption}
